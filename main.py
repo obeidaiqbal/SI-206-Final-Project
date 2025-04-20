@@ -31,9 +31,9 @@ def get_crime_data(cur):
         else:
             return f"Error: {response.status_code}, Message: {response.text}"
 
-def get_weather_data(cur):
+def get_weather_data(cur, start_date, end_date):
     location = "Chicago"
-    date_range = "2025-01-11/2025-04-20"
+    date_range = f"{start_date}/{end_date}"
     weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=44SZFD9YD4PU6UJDGPBX273CX&include=days&elements=datetime,temp,conditions,precip,preciptype"
     response = requests.get(weather_url)
     data = response.json()
@@ -41,7 +41,6 @@ def get_weather_data(cur):
     for day in data['days']:
         lst = [day['datetime'], day['temp'], day['conditions'], day['precip']]
         tbl.append(lst)
-    cur.execute("CREATE TABLE IF NOT EXISTS Weather (id INTEGER PRIMARY KEY AUTOINCREMENT, date_time TEXT, temp INTEGER, conditions TEXT, precip INTEGER)")
     for days in tbl:
         cur.execute("INSERT OR IGNORE INTO Weather (date_time, temp, conditions, precip) VALUES (?, ?, ?, ?)", days)
     
@@ -50,13 +49,17 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path + "/" + "weather_and_crime.db")
     cur = conn.cursor()
-    # get_weather_data(cur)
-    # get_crime_data(cur)
+
+    cur.execute("CREATE TABLE IF NOT EXISTS Weather (id INTEGER PRIMARY KEY AUTOINCREMENT, date_time TEXT, temp INTEGER, conditions TEXT, precip INTEGER)")
+
     date_ans = get_start_date(cur)
     date_1 = datetime.datetime.strptime(date_ans, "%Y-%m-%d").date()
     start_date = date_1 + datetime.timedelta(days=1)
     end_date = date_1 + datetime.timedelta(days=25)
     print(start_date,end_date)
+
+    get_weather_data(cur, start_date, end_date)
+
     conn.commit()
     conn.close()
     pass
