@@ -13,28 +13,26 @@ def get_start_date(cur):
        date = cur.fetchone()[0]
        return date
 
-def get_crime_data(cur):
+def get_crime_data(cur, start_date, end_date):
     crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
-    cur.execute('SELECT date_time FROM Weather')
-    dates = cur.fetchall()
-    cur.execute("CREATE TABLE IF NOT EXISTS Crime (id INTEGER PRIMARY KEY AUTOINCREMENT, incident_reports INTEGER, date_time TEXT)")
-    for date in dates:
-        date = date[0]
+    current_date = start_date
+    while current_date <= end_date:
         params = {
-            "$where": f"date between '{date}T00:00:00' and '{date}T23:59:59'",
+            "$where": f"date between '{current_date}T00:00:00' and '{current_date}T23:59:59'",
             "$select": "count(*)"
         }
         response = requests.get(crime_url, params=params)
         if response.status_code == 200:
             data = response.json()
-            cur.execute("INSERT OR IGNORE INTO Crime (incident_reports, date_time) VALUES (?,?)", (data[0]['count'], date))  
+            cur.execute("INSERT OR IGNORE INTO Crime (incident_reports, date_time) VALUES (?,?)", (data[0]['count'], current_date))  
         else:
             return f"Error: {response.status_code}, Message: {response.text}"
+        current_date += datetime.timedelta(days=1)
 
 def get_weather_data(cur, start_date, end_date):
     location = "Chicago"
     date_range = f"{start_date}/{end_date}"
-    weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=44SZFD9YD4PU6UJDGPBX273CX&include=days&elements=datetime,temp,conditions,precip,preciptype"
+    weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=DNXGTGKEVERK5EX6VR9XAG85C&include=days&elements=datetime,temp,conditions,precip,preciptype"
     response = requests.get(weather_url)
     data = response.json()
     tbl = []
@@ -51,7 +49,7 @@ def main():
     cur = conn.cursor()
 
     cur.execute("CREATE TABLE IF NOT EXISTS Weather (id INTEGER PRIMARY KEY AUTOINCREMENT, date_time TEXT, temp INTEGER, conditions TEXT, precip INTEGER)")
-
+    cur.execute("CREATE TABLE IF NOT EXISTS Crime (id INTEGER PRIMARY KEY AUTOINCREMENT, incident_reports INTEGER, date_time TEXT)")
     date_ans = get_start_date(cur)
     date_1 = datetime.datetime.strptime(date_ans, "%Y-%m-%d").date()
     start_date = date_1 + datetime.timedelta(days=1)
@@ -59,6 +57,7 @@ def main():
     print(start_date,end_date)
 
     get_weather_data(cur, start_date, end_date)
+    get_crime_data(cur, start_date, end_date)
 
     conn.commit()
     conn.close()
