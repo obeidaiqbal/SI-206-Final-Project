@@ -1,8 +1,10 @@
 import requests
+import sqlite3
+import os
 
 location = "Chicago"
-date_range = "2025-04-01/2025-04-01"
-weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=9QWKR8DW943NL88PUGYQDLC3C"
+date_range = "2025-01-11/2025-04-20"
+weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=44SZFD9YD4PU6UJDGPBX273CX&include=days&elements=datetime,temp,conditions,precip,preciptype"
 crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
 
 
@@ -23,17 +25,24 @@ def get_crime_data():
         return f"Error: {response.status_code}, Message: {response.text}"
 
 def get_weather_data():
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path + "/" + "weather_and_crime.db")
+    cur = conn.cursor()
     response = requests.get(weather_url)
     data = response.json()
     tbl = []
     for day in data['days']:
-        lst = [day['datetime'], day['conditions']]
+        lst = [day['datetime'], day['temp'], day['conditions'], day['precip']]
         tbl.append(lst)
-    return tbl
+    cur.execute("CREATE TABLE IF NOT EXISTS Weather (date_time TEXT PRIMARY KEY, temp INTEGER, conditions TEXT, precip INTEGER)")
+    for days in tbl:
+        cur.execute("INSERT OR IGNORE INTO Weather (date_time, temp, conditions, precip) VALUES (?, ?, ?, ?)", days)
+    conn.commit()
 
 def main():
-    print(f"Weather Conditions: {get_weather_data()}")
-    print(f"Incident Reports: {get_crime_data()}")
+    # get_weather_data()
+    # print(f"Incident Reports: {get_crime_data()}")
+    pass
 
 if __name__ == "__main__":
     main()
