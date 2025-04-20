@@ -1,7 +1,17 @@
 import requests
 import sqlite3
 import os
+import datetime
 
+def get_start_date(cur):
+   cur.execute("SELECT COUNT(*) FROM Weather")
+   count = cur.fetchone()[0]
+   if count == 0:
+       return '2025-01-01'
+   else:
+       cur.execute("SELECT date_time FROM Weather ORDER BY id DESC LIMIT 1")
+       date = cur.fetchone()[0]
+       return date
 
 def get_crime_data(cur):
     crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
@@ -40,8 +50,13 @@ def main():
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path + "/" + "weather_and_crime.db")
     cur = conn.cursor()
-    get_weather_data(cur)
-    get_crime_data(cur)
+    # get_weather_data(cur)
+    # get_crime_data(cur)
+    date_ans = get_start_date(cur)
+    date_1 = datetime.datetime.strptime(date_ans, "%Y-%m-%d").date()
+    start_date = date_1 + datetime.timedelta(days=1)
+    end_date = date_1 + datetime.timedelta(days=25)
+    print(start_date,end_date)
     conn.commit()
     conn.close()
     pass
