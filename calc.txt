@@ -1,0 +1,16 @@
+Average Temp and Average Incident_reports each week
+---------------------------------------------------
+Week 1: Avg. Temp = 22.83, Avg. Reports = 587.75
+Week 2: Avg. Temp = 25.27, Avg. Reports = 574.86
+Week 3: Avg. Temp = 21.21, Avg. Reports = 595.71
+Week 4: Avg. Temp = 15.39, Avg. Reports = 541.00
+Week 5: Avg. Temp = 37.27, Avg. Reports = 641.71
+Week 6: Avg. Temp = 30.59, Avg. Reports = 577.14
+Week 7: Avg. Temp = 24.07, Avg. Reports = 544.86
+Week 8: Avg. Temp = 17.06, Avg. Reports = 568.57
+Week 9: Avg. Temp = 39.77, Avg. Reports = 594.57
+Week 10: Avg. Temp = 40.93, Avg. Reports = 600.86
+Week 11: Avg. Temp = 50.07, Avg. Reports = 660.00
+Week 12: Avg. Temp = 43.69, Avg. Reports = 628.57
+Week 13: Avg. Temp = 50.86, Avg. Reports = 607.14
+Week 14: Avg. Temp = 45.09, Avg. Reports = 597.00
