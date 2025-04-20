@@ -3,9 +3,8 @@ import sqlite3
 import os
 
 
-def get_crime_data():
+def get_crime_data(date):
     crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
-    date = "2024-04-04"
     params = {
         "$where": f"date between '{date}T00:00:00' and '{date}T23:59:59'",
         "$select": "count(*)"
@@ -40,7 +39,7 @@ def get_weather_data():
 
 def main():
     # get_weather_data()
-    # print(f"Incident Reports: {get_crime_data()}")
+    # print(f"Incident Reports: {get_crime_data('2024-04-04')}")
     pass
 
 if __name__ == "__main__":
