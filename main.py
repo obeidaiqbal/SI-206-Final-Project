@@ -2,13 +2,9 @@ import requests
 import sqlite3
 import os
 
-location = "Chicago"
-date_range = "2025-01-11/2025-04-20"
-weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=44SZFD9YD4PU6UJDGPBX273CX&include=days&elements=datetime,temp,conditions,precip,preciptype"
-crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
-
 
 def get_crime_data():
+    crime_url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
     date = "2024-04-04"
     params = {
         "$where": f"date between '{date}T00:00:00' and '{date}T23:59:59'",
@@ -25,6 +21,9 @@ def get_crime_data():
         return f"Error: {response.status_code}, Message: {response.text}"
 
 def get_weather_data():
+    location = "Chicago"
+    date_range = "2025-01-11/2025-04-20"
+    weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{date_range}?key=44SZFD9YD4PU6UJDGPBX273CX&include=days&elements=datetime,temp,conditions,precip,preciptype"
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path + "/" + "weather_and_crime.db")
     cur = conn.cursor()
