@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import requests
 import sqlite3
 import os
@@ -19,11 +20,13 @@ def make_first_plot(cur):
     grouped = sorted(grouped.items(), key=lambda x: x[1])
     conditions = [item[0] for item in grouped]
     incidents = [item[1] for item in grouped]
-    plt.bar(conditions, incidents)
+    plt.figure(figsize=(10, 6))
+    plt.bar(conditions, incidents, color='darkred')
     plt.xlabel("Weather Conditions")
-    plt.ylabel("Incident Reports")
+    plt.ylabel("Total Incident Reports")
     plt.title("Crime Reports by Weather Condition")
-    plt.xticks(rotation = 45)
+    plt.xticks(rotation = 45, fontsize = 6)
+    plt.tight_layout()
     plt.savefig('incidents_by_condition.png')
     plt.close()
 
@@ -35,10 +38,16 @@ def make_second_plot(cur):
     incidents = [int(row[2]) for row in tbl]
     combined = sorted(zip(temps, incidents), key=lambda x: x[0])
     temps, incidents = zip(*combined)
-    plt.scatter(temps, incidents)
+    plt.figure(figsize=(12, 6))
+    plt.scatter(temps, incidents, color='darkred', alpha=0.7)
     plt.xlabel("Temperature (°F)")
-    plt.ylabel("Incident Reports")
+    plt.ylabel("Incident Reports by Day")
     plt.title("Incident Reports by Temperature")
+    plt.grid(True)
+    z = np.polyfit(temps, incidents, 1)  
+    p = np.poly1d(z)
+    x = np.linspace(min(temps), max(temps), 100)
+    plt.plot(x, p(x), "r--")
     plt.savefig('incidents_by_temperature.png')
     plt.close()
 
